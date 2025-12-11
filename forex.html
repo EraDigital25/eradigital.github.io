@@ -1,0 +1,545 @@
+
+<!-- forex-leverage-calculator.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forex Leverage Calculator</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #94a3b8;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --body-bg: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .select-wrapper, input, .radio-group {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 1rem;
+        }
+
+        .select-wrapper:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .grid-2 {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            border: none;
+            padding: 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-option input {
+            width: auto;
+            padding: 0;
+            border: none;
+        }
+
+        .info-box {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .info-primary {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .info-box h3 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .result-loss {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .result-position {
+            background-color: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .result-label {
+            font-size: 0.875rem;
+        }
+
+        .leverage-card {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .leverage-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #1d4ed8;
+            margin: 0.5rem 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .lot-card {
+            background-color: #ede9fe;
+            border: 1px solid #ddd6fe;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .lot-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7c3aed;
+            margin: 0.5rem 0;
+        }
+
+        .execution-section {
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .execution-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .execution-list {
+            list-style: none;
+        }
+
+        .execution-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .execution-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .execution-bullet {
+            display: inline-flex;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .bullet-green { background-color: var(--success); }
+        .bullet-blue { background-color: var(--primary); }
+        .bullet-purple { background-color: var(--secondary); }
+        .bullet-red { background-color: var(--danger); }
+
+        .execution-text {
+            line-height: 1.5;
+        }
+
+        .execution-text strong {
+            font-weight: 600;
+        }
+
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .placeholder-box {
+            width: 64px;
+            height: 64px;
+            background-color: #e2e8f0;
+            border: 2px dashed #94a3b8;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            .card-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Forex Leverage Calculator</h1>
+            <p class="subtitle">Calculate exact leverage to lose 100% at stop loss</p>
+        </header>
+
+        <div class="grid">
+            <!-- Input Form Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Trade Parameters</h2>
+                    <p class="card-description">Enter your trade details to calculate required leverage</p>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label for="currency-pair">Currency Pair</label>
+                        <select id="currency-pair" class="select-wrapper">
+                            <option value="EUR/USD">EUR/USD</option>
+                            <option value="USD/JPY">USD/JPY</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="entry-price">Entry Price</label>
+                            <input type="number" id="entry-price" step="0.0001" placeholder="1.0950">
+                        </div>
+                        <div class="form-group">
+                            <label for="stop-loss">Stop Loss</label>
+                            <input type="number" id="stop-loss" step="0.0001" placeholder="1.0900">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Trade Direction</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="long" name="direction" value="long" checked>
+                                <label for="long">Long (Buy)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="short" name="direction" value="short">
+                                <label for="short">Short (Sell)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box info-primary">
+                        <h3>How it works</h3>
+                        <p>This calculator determines the exact leverage needed so that if your stop loss is hit, you lose exactly 100% of your investment. Each pip is valued at $1. Calculations based on mini lots (0.1 lots).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Leverage Calculation</h2>
+                    <p class="card-description">Required leverage and position details</p>
+                </div>
+                <div class="card-content">
+                    <div id="results-container">
+                        <div class="placeholder">
+                            <div class="placeholder-box"></div>
+                            <p>Enter trade parameters to calculate leverage</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Note: Each pip is valued at $1. Calculations based on mini lots (10,000 units).</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const currencyPairSelect = document.getElementById('currency-pair');
+            const entryPriceInput = document.getElementById('entry-price');
+            const stopLossInput = document.getElementById('stop-loss');
+            const directionInputs = document.querySelectorAll('input[name="direction"]');
+            const resultsContainer = document.getElementById('results-container');
+            
+            // Currency pair data
+            const currencyPairs = {
+                "EUR/USD": { pipValue: 1, isJpy: false },
+                "USD/JPY": { pipValue: 1, isJpy: true }
+            };
+            
+            // Function to calculate leverage
+            function calculateLeverage() {
+                const currencyPair = currencyPairSelect.value;
+                const entryPrice = parseFloat(entryPriceInput.value);
+                const stopLoss = parseFloat(stopLossInput.value);
+                const direction = document.querySelector('input[name="direction"]:checked').value;
+                
+                // Validate inputs
+                if (isNaN(entryPrice) || isNaN(stopLoss) || entryPrice === stopLoss || !entryPrice || !stopLoss) {
+                    resultsContainer.innerHTML = `
+                        <div class="placeholder">
+                            <div class="placeholder-box"></div>
+                            <p>Enter trade parameters to calculate leverage</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Get pair data
+                const pair = currencyPairs[currencyPair];
+                if (!pair) return;
+                
+                // Calculate pip distance
+                const isJpyPair = pair.isJpy;
+                const decimals = isJpyPair ? 2 : 4;
+                const multiplier = Math.pow(10, decimals);
+                const pipDistance = Math.abs((entryPrice - stopLoss) * multiplier);
+                
+                // Fixed pip value of $1
+                const pipValue = 1;
+                
+                // Calculate loss at SL (this becomes our position size)
+                const lossAtSL = pipDistance * pipValue;
+                const positionSize = lossAtSL; // As per requirement
+                
+                // Calculate leverage based on mini lot (10,000 units)
+                const miniLotSize = 10000;
+                const leverage = miniLotSize / positionSize;
+                
+                // Lot size is always 1 mini lot (0.1 standard lots)
+                const lotSize = 0.1;
+                const lotType = "Mini (0.1 lots)";
+                
+                // Render results
+                resultsContainer.innerHTML = `
+                    <div class="results-grid">
+                        <div class="result-card result-loss">
+                            <div class="result-label">Loss at Stop Loss</div>
+                            <div class="result-value">$${lossAtSL.toFixed(2)}</div>
+                            <div class="result-label">${pipDistance.toFixed(1)} pips × $1/pip</div>
+                        </div>
+                        <div class="result-card result-position">
+                            <div class="result-label">Position Size</div>
+                            <div class="result-value">$${positionSize.toFixed(2)}</div>
+                            <div class="result-label">Equal to SL loss (100% risk)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="leverage-card">
+                        <div class="result-label">Required Leverage</div>
+                        <span class="badge">${leverage.toFixed(0)}:1</span>
+                        <div class="leverage-value">${leverage.toFixed(0)}:1</div>
+                        <div class="result-label">This leverage ensures exactly 100% loss at stop loss</div>
+                    </div>
+                    
+                    <div class="lot-card">
+                        <div class="result-label">Lot Size</div>
+                        <div class="lot-value">${lotSize.toFixed(1)} lots</div>
+                        <div class="result-label">${lotType}</div>
+                    </div>
+                    
+                    <div class="execution-section">
+                        <h3 class="execution-title">Trade Execution</h3>
+                        <ul class="execution-list">
+                            <li class="execution-item">
+                                <span class="execution-bullet bullet-green">•</span>
+                                <span class="execution-text">Invest: <strong>$${positionSize.toFixed(2)}</strong></span>
+                            </li>
+                            <li class="execution-item">
+                                <span class="execution-bullet bullet-blue">•</span>
+                                <span class="execution-text">Open position: <strong>${lotSize.toFixed(1)} mini lots</strong></span>
+                            </li>
+                            <li class="execution-item">
+                                <span class="execution-bullet bullet-purple">•</span>
+                                <span class="execution-text">Use leverage: <strong>${leverage.toFixed(0)}:1</strong></span>
+                            </li>
+                            <li class="execution-item">
+                                <span class="execution-bullet bullet-red">•</span>
+                                <span class="execution-text">If SL hits: Lose <strong>100%</strong> ($${lossAtSL.toFixed(2)})</span>
+                            </li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // Add event listeners
+            currencyPairSelect.addEventListener('change', calculateLeverage);
+            entryPriceInput.addEventListener('input', calculateLeverage);
+            stopLossInput.addEventListener('input', calculateLeverage);
+            directionInputs.forEach(input => {
+                input.addEventListener('change', calculateLeverage);
+            });
+        });
+    </script>
+</body>
+</html>
